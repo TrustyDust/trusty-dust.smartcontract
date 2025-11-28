@@ -15,6 +15,13 @@ contract Core {
     uint256 public commentReward = 3e18;
     uint256 public repostReward = 1e18;
 
+    event SocialRewarded(
+        address indexed user,
+        SharedTypes.SocialAction action,
+        uint256 amount
+    );
+    event JobRewarded(address indexed user, uint8 rating, uint256 amount);
+
     constructor(Identity identity_, DustToken dust_) {
         identity = identity_;
         dust = dust_;
@@ -25,26 +32,26 @@ contract Core {
         uint256 delta = action == SharedTypes.SocialAction.LIKE
             ? likeReward
             : action == SharedTypes.SocialAction.COMMENT
-                ? commentReward
-                : repostReward;
+            ? commentReward
+            : repostReward;
 
         identity.addTrust(user, delta);
         dust.mint(user, delta);
+        emit SocialRewarded(user, action, delta);
     }
 
     function rewardJob(address user, uint8 rating) external {
         require(rating >= 1 && rating <= 5, "invalid rating");
-        uint256 delta = rating == 5
-            ? 200e18
-            : rating == 4
-                ? 150e18
-                : rating == 3
-                    ? 100e18
-                    : rating == 2
-                        ? 50e18
-                        : 20e18;
+        uint256 delta = rating == 5 ? 200e18 : rating == 4
+            ? 150e18
+            : rating == 3
+            ? 100e18
+            : rating == 2
+            ? 50e18
+            : 20e18;
         identity.addTrust(user, delta);
         identity.addJobCompleted(user);
         dust.mint(user, delta);
+        emit JobRewarded(user, rating, delta);
     }
 }

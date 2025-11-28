@@ -1,39 +1,10 @@
-contracts/
+src/
 │
-├── core/
-│   ├── TrustCoreProxy.sol
-│   ├── TrustCoreImpl.sol
-│   └── ProxyAdmin.sol
-│
-├── identity/
-│   ├── TrustBadgeSBT.sol
-│   ├── TrustReputation1155.sol
-│   └── MetadataUtils.sol         # helper update metadata
-│
-├── verification/
-│   └── TrustVerification.sol     # ZK verifier
-│
-├── token/
-│   ├── DustToken.sol
-│   └── TokenErrors.sol
-│
-├── jobs/
-│   ├── JobMarketplace.sol
-│   ├── EscrowVault.sol
-│   └── JobEvents.sol             # shared event definitions
-│
-├── reward/
-│   └── RewardEngine.sol
-│
-├── interfaces/
-│   ├── ITrustCore.sol
-│   ├── IJobMarketplace.sol
-│   ├── IDustToken.sol
-│   ├── IReputation1155.sol
-│   ├── IBadgeSBT.sol
-│   └── ITrustVerification.sol
-│
-└── libs/
-    ├── SafeTransferLib.sol
-    ├── MathUtils.sol
-    └── Errors.sol
+├── DustToken.sol       # ERC20 non-transferable with Role {OWNER, OPERATOR, SYSTEM}
+├── Identity.sol        # Registry of users (trustScore, tier, reputation, posts, jobsCompleted, hasBadge)
+├── Core.sol            # Reward logic for social actions and job ratings; mints DUST + updates Identity
+├── Content.sol         # Burns 10 DUST to record a post in Identity
+├── Jobs.sol            # Simple job board: create burns 10 DUST; assign/approve/cancel; rewards via Core
+├── Verifier.sol        # External verifier wrapper; can set verifiers; successful tier writes to Identity
+├── SharedTypes.sol     # Enums (SocialAction, JobStatus) and structs (User, Job)
+└── Errors.sol          # Custom errors (Unauthorized, ZeroAddress, ZeroAmount, InvalidInput, InvalidState, InsufficientBalance)

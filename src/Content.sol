@@ -10,13 +10,16 @@ contract Content {
     DustToken public dust;
     uint256 public constant POST_FEE = 10e18; // 10 DUST (18 decimals)
 
+    event PostMinted(address indexed user, uint256 fee);
+
     constructor(Identity identity_, DustToken dust_) {
         identity = identity_;
         dust = dust_;
     }
 
-    function mintPost(string calldata /*uri*/ ) external {
+    function mintPost(string calldata /*uri*/) external {
         dust.burn(msg.sender, POST_FEE);
         identity.addPost(msg.sender);
+        emit PostMinted(msg.sender, POST_FEE);
     }
 }
