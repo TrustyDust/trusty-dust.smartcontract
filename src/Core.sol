@@ -4,6 +4,7 @@ pragma solidity ^0.8.30;
 import {Identity} from "./Identity.sol";
 import {DustToken} from "./DustToken.sol";
 import {SharedTypes} from "./SharedTypes.sol";
+import {Errors} from "./Errors.sol";
 
 /// @notice Core reward/tier logic with simplified access (no role functions).
 contract Core {
@@ -28,6 +29,9 @@ contract Core {
     }
 
     function rewardSocial(address user, uint8 actionType) external {
+        if (user == address(0)) revert Errors.ZeroAddress();
+        if (actionType > uint8(SharedTypes.SocialAction.REPOST)) revert Errors.InvalidInput();
+
         SharedTypes.SocialAction action = SharedTypes.SocialAction(actionType);
         uint256 delta = action == SharedTypes.SocialAction.LIKE
             ? likeReward
@@ -41,6 +45,7 @@ contract Core {
     }
 
     function rewardJob(address user, uint8 rating) external {
+        if (user == address(0)) revert Errors.ZeroAddress();
         require(rating >= 1 && rating <= 5, "invalid rating");
         uint256 delta = rating == 5 ? 200e18 : rating == 4
             ? 150e18

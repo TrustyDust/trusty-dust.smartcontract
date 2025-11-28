@@ -23,16 +23,9 @@ contract DustTokenTest is Test {
     }
 
     function testTransferRevertZero() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC20Errors.ERC20InvalidReceiver.selector,
-                address(0)
-            )
-        );
         vm.prank(alice);
-        bool successZero = dust.transfer(address(0), 1);
-        successZero;
-        assertEq(dust.balanceOf(alice), 100e18);
+        vm.expectRevert(abi.encodeWithSelector(IERC20Errors.ERC20InvalidReceiver.selector, address(0)));
+        dust.transfer(address(0), 1);
     }
 
     function testBurn() public {

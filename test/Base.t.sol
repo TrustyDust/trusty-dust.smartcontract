@@ -25,8 +25,8 @@ contract BaseTest is Test {
         dust = new DustToken("Dust", "DUST", address(this));
         identity = new Identity();
         core = new Core(identity, dust);
-        content = new Content(identity, dust);
-        jobs = new Jobs(identity, dust, core);
+        content = new Content(identity, dust, "Content", "CNT", "https://ipfs.pinata.cloud/ipfs/");
+        jobs = new Jobs(identity, dust, core, "Jobs", "JOB", "https://ipfs.pinata.cloud/ipfs/");
         verifier = new Verifier(identity);
 
         // grant operator roles to contracts that mint/burn

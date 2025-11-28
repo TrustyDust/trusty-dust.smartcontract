@@ -3,6 +3,7 @@ pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
 import {Identity} from "src/Identity.sol";
+import {SharedTypes} from "src/SharedTypes.sol";
 
 contract IdentityTest is Test {
     Identity internal identity;
@@ -15,19 +16,19 @@ contract IdentityTest is Test {
     function testAddTrustAndTier() public {
         identity.addTrust(user, 10);
         identity.setTier(user, 2);
-        (uint256 trust, uint256 tier,,,,bool hasBadge) = identity.users(user);
-        assertEq(trust, 10);
-        assertEq(tier, 2);
-        assertTrue(hasBadge);
+        SharedTypes.User memory u = identity.getUser(user);
+        assertEq(u.trustScore, 10);
+        assertEq(u.tier, 2);
+        assertTrue(u.hasBadge);
     }
 
     function testReputationPostsJobs() public {
         identity.addReputation(user, 5);
         identity.addPost(user);
         identity.addJobCompleted(user);
-        (, , uint256 rep, uint256 posts, uint256 jobs,) = identity.users(user);
-        assertEq(rep, 5);
-        assertEq(posts, 1);
-        assertEq(jobs, 1);
+        SharedTypes.User memory u2 = identity.getUser(user);
+        assertEq(u2.reputation, 5);
+        assertEq(u2.posts, 1);
+        assertEq(u2.jobsCompleted, 1);
     }
 }

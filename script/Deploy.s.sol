@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.30;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {DustToken} from "src/DustToken.sol";
@@ -12,6 +12,8 @@ import {Verifier} from "src/Verifier.sol";
 /// @notice One-shot deployment wiring all contracts together.
 /// Uses PRIVATE_KEY from env when broadcasting.
 contract Deploy is Script {
+    string internal constant BASE_URI = "https://ipfs.pinata.cloud/ipfs/";
+
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(pk);
@@ -24,8 +26,8 @@ contract Deploy is Script {
         // 2) Deploy core components
         Identity identity = new Identity();
         Core core = new Core(identity, dust);
-        Content content = new Content(identity, dust);
-        Jobs jobs = new Jobs(identity, dust, core);
+        Content content = new Content(identity, dust, "Content", "CNT", BASE_URI);
+        Jobs jobs = new Jobs(identity, dust, core, "Jobs", "JOB", BASE_URI);
         Verifier verifier = new Verifier(identity);
 
         // 3) Wire roles

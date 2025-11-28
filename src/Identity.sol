@@ -42,4 +42,9 @@ contract Identity {
         users[user].jobsCompleted += 1;
         emit JobCompleted(user, users[user].jobsCompleted);
     }
+
+    function getUser(address user) external view returns (SharedTypes.User memory data) {
+        data = users[user];
+    }
 }
+

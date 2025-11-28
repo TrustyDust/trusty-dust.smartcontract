@@ -23,6 +23,11 @@ library SharedTypes {
         bool hasBadge;
     }
 
+    struct ContentItem {
+        uint256 id;
+        address author;
+    }
+
     struct Job {
         uint256 id;
         address poster;

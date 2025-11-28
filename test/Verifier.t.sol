@@ -32,7 +32,8 @@ contract VerifierTest is Test {
         bytes memory proof = hex"01";
         bool ok = verifier.verifyTier(proof, 2, 100);
         assertTrue(ok);
-        (, uint256 tierVal,,,,bool hasBadge) = identity.users(user);
+        uint256 tierVal = identity.getUser(user).tier;
+bool hasBadge = identity.getUser(user).hasBadge;
         assertEq(tierVal, 2);
         assertTrue(hasBadge);
     }

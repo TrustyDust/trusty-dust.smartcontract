@@ -11,11 +11,12 @@ contract ContentTest is Test {
     DustToken internal dust;
     Content internal content;
     address internal user = address(0xA11CE);
+    string internal constant BASE_URI = "https://ipfs.pinata.cloud/ipfs/";
 
     function setUp() public {
         identity = new Identity();
         dust = new DustToken("Dust", "DUST", address(this));
-        content = new Content(identity, dust);
+        content = new Content(identity, dust, "Content", "CNT", BASE_URI);
         dust.setRole(address(content), DustToken.Role.OPERATOR);
         dust.setRole(address(this), DustToken.Role.OPERATOR);
     }
@@ -24,7 +25,7 @@ contract ContentTest is Test {
         dust.mint(user, 20e18);
         vm.prank(user);
         content.mintPost("ipfs://uri");
-        (, , , uint256 posts, , ) = identity.users(user);
+        uint256 posts = identity.getUser(user).posts;
         assertEq(posts, 1);
         assertEq(dust.balanceOf(user), 10e18);
     }

@@ -27,6 +27,7 @@ contract IntegrationTest is BaseTest {
     address internal poster;
     address internal worker;
     address internal user;
+    string internal constant JOB_CID = "ipfs://job";
 
     function setUp() public override {
         super.setUp();
@@ -39,7 +40,7 @@ contract IntegrationTest is BaseTest {
 
     function testFullJobFlowAndRewards() public {
         vm.prank(poster);
-        uint256 jobId = jobs.createJob(50e18);
+        uint256 jobId = jobs.createJob(50e18, JOB_CID);
         assertEq(dust.balanceOf(poster), 990e18);
 
         vm.prank(poster);
@@ -48,12 +49,13 @@ contract IntegrationTest is BaseTest {
         vm.prank(poster);
         jobs.approveJob(jobId, 4);
 
-        (uint256 trust, , , , uint256 jobsCompleted, ) = identity.users(worker);
+        uint256 trust = identity.getUser(worker).trustScore;
+        uint256 jobsCompleted = identity.getUser(worker).jobsCompleted;
         assertEq(trust, 150e18);
         assertEq(jobsCompleted, 1);
         assertEq(dust.balanceOf(worker), 1_150e18);
 
-        (, , , , , SharedTypes.JobStatus status) = jobs.jobs(jobId);
+        SharedTypes.JobStatus status = jobs.getJob(jobId).status;
         assertEq(uint8(status), uint8(SharedTypes.JobStatus.COMPLETED));
     }
 
@@ -62,7 +64,7 @@ contract IntegrationTest is BaseTest {
         core.rewardSocial(user, uint8(SharedTypes.SocialAction.COMMENT));
         core.rewardSocial(user, uint8(SharedTypes.SocialAction.REPOST));
 
-        (uint256 trust, , , , , ) = identity.users(user);
+        uint256 trust = identity.getUser(user).trustScore;
         assertEq(trust, 5e18);
         assertEq(dust.balanceOf(user), 1_005e18);
     }
@@ -75,14 +77,14 @@ contract IntegrationTest is BaseTest {
         content.mintPost("ipfs://2");
 
         core.rewardJob(user, 5); // +200e18
-        (, , , uint256 posts, , ) = identity.users(user);
+        uint256 posts = identity.getUser(user).posts;
         assertEq(posts, 2);
         assertEq(dust.balanceOf(user), 1_200e18);
     }
 
     function testCancelJobUnauthorizedReverts() public {
         vm.prank(poster);
-        uint256 jobId = jobs.createJob(10e18);
+        uint256 jobId = jobs.createJob(10e18, JOB_CID);
         vm.prank(worker);
         vm.expectRevert(Errors.Unauthorized.selector);
         jobs.cancelJob(jobId);
@@ -91,7 +93,8 @@ contract IntegrationTest is BaseTest {
     function testVerifierTierUpdate() public {
         bool ok = verifier.verifyTier(hex"01", 3, 500);
         assertTrue(ok);
-        (, uint256 tier, , , , bool hasBadge) = identity.users(address(this));
+        uint256 tier = identity.getUser(address(this)).tier;
+        bool hasBadge = identity.getUser(address(this)).hasBadge;
         assertEq(tier, 3);
         assertTrue(hasBadge);
     }

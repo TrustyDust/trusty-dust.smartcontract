@@ -22,14 +22,14 @@ contract CoreTest is Test {
 
     function testRewardSocialLike() public {
         core.rewardSocial(user, 0); // LIKE
-        (uint256 trust, , , , , ) = identity.users(user);
+        uint256 trust = identity.getUser(user).trustScore;
         assertEq(trust, 1e18);
         assertEq(dust.balanceOf(user), 1e18);
     }
 
     function testRewardJobRating5() public {
         core.rewardJob(user, 5);
-        (uint256 trust, , , , , ) = identity.users(user);
+        uint256 trust = identity.getUser(user).trustScore;
         assertEq(trust, 200e18);
         assertEq(dust.balanceOf(user), 200e18);
     }

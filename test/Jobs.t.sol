@@ -18,11 +18,15 @@ contract JobsTest is Test {
     address internal poster = address(0xA11CE);
     address internal worker = address(0xB0B);
 
+    uint256 internal constant MIN_SCORE = 10;
+    string internal constant BASE_URI = "https://ipfs.pinata.cloud/ipfs/";
+    string internal constant JOB_CID = "ipfs://job";
+
     function setUp() public {
         identity = new Identity();
         dust = new DustToken("Dust", "DUST", address(this));
         core = new Core(identity, dust);
-        jobs = new Jobs(identity, dust, core);
+        jobs = new Jobs(identity, dust, core, "JobSBT", "JOB", BASE_URI);
         // grant operator roles to contracts that mint/burn
         dust.setRole(address(core), DustToken.Role.OPERATOR);
         dust.setRole(address(jobs), DustToken.Role.OPERATOR);
@@ -33,26 +37,26 @@ contract JobsTest is Test {
 
     function testCreateJobBurnsFee() public {
         vm.prank(poster);
-        uint256 jobId = jobs.createJob(10e18);
+        uint256 jobId = jobs.createJob(MIN_SCORE, JOB_CID);
         assertEq(jobId, 1);
         assertEq(dust.balanceOf(poster), 90e18);
     }
 
     function testApproveJobUpdatesStatusAndRewards() public {
         vm.prank(poster);
-        uint256 jobId = jobs.createJob(10e18);
+        uint256 jobId = jobs.createJob(MIN_SCORE, JOB_CID);
         vm.prank(poster);
         jobs.assignWorker(jobId, worker);
         vm.prank(poster);
         jobs.approveJob(jobId, 5);
-        (, , , , uint256 jobsCompleted, ) = identity.users(worker);
+        uint256 jobsCompleted = identity.getUser(worker).jobsCompleted;
         assertEq(jobsCompleted, 1);
         assertEq(dust.balanceOf(worker), 300e18); // initial 100e18 + reward 200e18
     }
 
     function testApproveJobWrongPosterReverts() public {
         vm.prank(poster);
-        uint256 jobId = jobs.createJob(10e18);
+        uint256 jobId = jobs.createJob(MIN_SCORE, JOB_CID);
         vm.expectRevert(Errors.Unauthorized.selector);
         vm.prank(worker);
         jobs.approveJob(jobId, 3);
@@ -60,10 +64,10 @@ contract JobsTest is Test {
 
     function testCancelJob() public {
         vm.prank(poster);
-        uint256 jobId = jobs.createJob(10e18);
+        uint256 jobId = jobs.createJob(MIN_SCORE, JOB_CID);
         vm.prank(poster);
         jobs.cancelJob(jobId);
-        (, , , , , SharedTypes.JobStatus status) = jobs.jobs(jobId);
+        SharedTypes.JobStatus status = jobs.getJob(jobId).status;
         assertEq(uint8(status), uint8(SharedTypes.JobStatus.CANCELLED));
     }
 }
