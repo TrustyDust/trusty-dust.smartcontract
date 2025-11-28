@@ -40,12 +40,12 @@ DEPLOYER=$(cast wallet address $PRIVATE_KEY)
 echo "Deployer: $DEPLOYER"
 
 # 4. REPLACE THESE WITH REAL ADDRESSES FROM LOG
-DUST="0x5B99B1363F634CbF43FC13bd6D425285022aC469"
-IDENTITY="0x8219dF54d4de0012Fde4BaBf0D39437f4652B85d"
-CORE="0xA6b64d740De8FFD7EFD67Ff6296cD3CC9A0aac04"
-CONTENT="0x9C41c06011d228f08B907B073D3a12800d35C0e9"
-JOBS="0x0691D75F7689142c304CE49ae89eaDC13Ab2cF27"
-VERIFIER="0xC206a244Ff6f8104d24f78994a8b47D72D0c1d0D"
+DUST="0x1132930Ad19B0799542EC7d54199b9E41C17dD97"
+IDENTITY="0x34B8fC5C8d90c45FA74f286080007Dd71b2e3F11"
+CORE="0x563854442B2C517db5714e6975E517612A06BD82"
+CONTENT="0xED66cEF23B7F88a7A8CaF3B9D84F2bC1505C6FA7"
+JOBS="0x69C65978B7Bd891801163557067Eb401767979cC"
+VERIFIER="0xf3b3E0f3C878124388F7aac493bd8f9D8c2B011f"
 
 echo ""
 echo "⚠️  Update contract address manually first!"
@@ -58,7 +58,7 @@ echo ""
 echo "✅ VERIFYING DustToken"
 
 forge verify-contract \
-  --chain-id 84532 \
+  --chain-id $CHAINID \
   $DUST \
   src/DustToken.sol:DustToken \
   --constructor-args $(cast abi-encode "constructor(string,string,address)" "Dust" "DUST" $DEPLOYER) \
@@ -73,7 +73,7 @@ forge verify-contract \
 echo "✅ VERIFYING Identity"
 
 forge verify-contract \
-  --chain-id 84532 \
+  --chain-id $CHAINID \
   $IDENTITY \
   src/Identity.sol:Identity \
   --num-of-optimizations 200 \
@@ -87,7 +87,7 @@ forge verify-contract \
 echo "✅ VERIFYING Core"
 
 forge verify-contract \
-  --chain-id 84532 \
+  --chain-id $CHAINID \
   $CORE \
   src/Core.sol:Core \
   --constructor-args $(cast abi-encode "constructor(address,address)" $IDENTITY $DUST) \
@@ -102,7 +102,7 @@ forge verify-contract \
 echo "✅ VERIFYING Content"
 
 forge verify-contract \
-  --chain-id 84532 \
+  --chain-id $CHAINID \
   $CONTENT \
   src/Content.sol:Content \
   --constructor-args $(cast abi-encode "constructor(address,address)" $IDENTITY $DUST) \
@@ -117,7 +117,7 @@ forge verify-contract \
 echo "✅ VERIFYING Jobs"
 
 forge verify-contract \
-  --chain-id 84532 \
+  --chain-id $CHAINID \
   $JOBS \
   src/Jobs.sol:Jobs \
   --constructor-args $(cast abi-encode "constructor(address,address,address)" $IDENTITY $DUST $CORE) \
@@ -132,7 +132,7 @@ forge verify-contract \
 echo "✅ VERIFYING Verifier"
 
 forge verify-contract \
-  --chain-id 84532 \
+  --chain-id $CHAINID \
   $VERIFIER \
   src/Verifier.sol:Verifier \
   --constructor-args $(cast abi-encode "constructor(address)" $IDENTITY) \

@@ -40,7 +40,10 @@ contract DustToken is ERC20 {
         roles[user] = role;
     }
 
-    function mint(address to, uint256 amount) external onlyRole(Role.OPERATOR) {
+    function mint(
+        address to,
+        uint256 amount
+    ) external onlyRole(Role.OPERATOR) onlyRole(Role.OWNER) {
         if (to == address(0)) revert Errors.ZeroAddress();
         if (amount == 0) revert Errors.ZeroAmount();
 
@@ -50,7 +53,7 @@ contract DustToken is ERC20 {
     function burn(
         address from,
         uint256 amount
-    ) external onlyRole(Role.OPERATOR) {
+    ) external onlyRole(Role.OPERATOR) onlyRole(Role.OWNER) {
         if (from == address(0)) revert Errors.ZeroAddress();
         if (amount == 0) revert Errors.ZeroAmount();
 
